@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		785E20E12D764BAA00A8E5B9 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 785E20E02D764BAA00A8E5B9 /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		785E20C12D7649A300A8E5B9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		785E20AC2D7649A100A8E5B9 /* PhotoCleaner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotoCleaner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		785E20C02D7649A300A8E5B9 /* PhotoCleanerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhotoCleanerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		785E20CA2D7649A300A8E5B9 /* PhotoCleanerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhotoCleanerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		785E20E02D764BAA00A8E5B9 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -88,6 +93,7 @@
 		785E20A32D7649A100A8E5B9 = {
 			isa = PBXGroup;
 			children = (
+				785E20E02D764BAA00A8E5B9 /* .gitignore */,
 				785E20AE2D7649A100A8E5B9 /* PhotoCleaner */,
 				785E20C32D7649A300A8E5B9 /* PhotoCleanerTests */,
 				785E20CD2D7649A300A8E5B9 /* PhotoCleanerUITests */,
@@ -225,6 +231,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				785E20E12D764BAA00A8E5B9 /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
