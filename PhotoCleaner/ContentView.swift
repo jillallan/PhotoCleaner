@@ -15,27 +15,18 @@ struct ContentView: View {
     var body: some View {
         TabView {
             Tab("Overview", systemImage: "house") {
+                MainView()
+            }
+            Tab("Progress", systemImage: "chart.bar") {
 //                SummaryView()
             }
-            Tab("Progress", systemImage: "house") {
-//                SummaryView()
+            TabSection("Collections") {
+                Tab("On this day", systemImage: "calendar") {
+    //                SummaryView()
+                }
             }
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
-        }
+        .tabViewStyle(.sidebarAdaptable)
     }
 }
 
