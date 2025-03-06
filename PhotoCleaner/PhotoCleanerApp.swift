@@ -25,7 +25,7 @@ struct PhotoCleanerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PhotoCleanerTabView()
         }
         .modelContainer(sharedModelContainer)
     }
