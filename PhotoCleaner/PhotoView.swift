@@ -1,5 +1,5 @@
 //
-//  MainView.swift
+//  PhotoView.swift
 //  PhotoCleaner
 //
 //  Created by Jill Allan on 03/03/2025.
@@ -8,15 +8,17 @@
 import Photos
 import SwiftUI
 
-struct ContentView: View {
+struct PhotoView: View {
     @Environment(\.displayScale) private var displayScale
 
-    @State var loadedImage: UIImage?
-    @State var loadedAssets: PhotoAssetCollection?
+    let filter: Filter
+    var photoCollection = PhotoCollection(collectionType: .all)
+
+    @State var photoAssets: PhotoAssetCollection?
 
     private static let itemSpacing = 12.0
     private static let itemCornerRadius = 15.0
-    private static let itemSize = CGSize(width: 90, height: 90)
+    private static let itemSize = CGSize(width: 180, height: 180)
 
     private var imageSize: CGSize {
         return CGSize(width: Self.itemSize.width * min(displayScale, 2), height: Self.itemSize.height * min(displayScale, 2))
@@ -27,39 +29,41 @@ struct ContentView: View {
     ]
 
     var body: some View {
-        VStack {
-            if let loadedAssets {
+        NavigationStack {
+            VStack {
                 ScrollView {
                     LazyVGrid(columns: columns) {
-                        ForEach(loadedAssets) { asset in
-                            VStack {
-                                ImageView(asset: asset)
-                            }
+                        ForEach(photoCollection.photoAssets) { asset in
+                            photoItemView(asset: asset)
                         }
                     }
                 }
             }
+            .onAppear {
+                Task {
+                     await photoCollection.refreshPhotoAssets()
+                }
+            }
+            .navigationTitle(filter.name)
         }
-        .onAppear {
-            getImage()
-            getImages()
-        }
-
     }
 
-    func getImages() {
-        if let collection = PHAssetCollection.fetchAssetCollections(
-            with: .smartAlbum,
-            subtype: .smartAlbumUserLibrary,
-            options: nil
-        ).firstObject {
-            let assets = PHAsset.fetchAssets(in: collection, options: nil)
-            let photoAssetCollection = PhotoAssetCollection(assets)
-            loadedAssets = photoAssetCollection
-            for asset in photoAssetCollection {
-                print(asset.identifier)
-            }
-        }
+    init(filter: Filter) {
+        self.filter = filter
+        let photoCollection = PhotoCollection(
+            collectionType: filter.photoCollectionType
+        )
+        self.photoCollection = photoCollection
+    }
+
+    private func photoItemView(asset: PhotoAsset) -> some View {
+        PhotoDetailView(asset: asset, imageSize: imageSize)
+            .frame(
+                width: PhotoView.itemSize.width,
+                height: PhotoView.itemSize.height
+            )
+            .clipped()
+            .cornerRadius(PhotoView.itemCornerRadius)
     }
 
     func getImage() {
@@ -81,7 +85,6 @@ struct ContentView: View {
                         options: nil) { image, info in
                             if let image {
                                 print(image.size)
-                                loadedImage = image
                             }
                         }
             }
@@ -90,5 +93,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    PhotoView(filter: .all)
 }

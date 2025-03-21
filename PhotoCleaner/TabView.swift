@@ -11,19 +11,15 @@ import SwiftData
 struct PhotoCleanerTabView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
+    @State private var selectedTab: Filter = .all
 
     var body: some View {
-        TabView {
-            Tab("Overview", systemImage: "house") {
-                ContentView()
+        TabView(selection: $selectedTab) {
+            Tab(Filter.all.name, systemImage: Filter.all.icon, value: .all) {
+                PhotoView(filter: Filter.all)
             }
-            Tab("Progress", systemImage: "chart.bar") {
-//                SummaryView()
-            }
-            TabSection("Collections") {
-                Tab("On this day", systemImage: "calendar") {
-    //                SummaryView()
-                }
+            Tab(Filter.onThisDay.name, systemImage: Filter.onThisDay.icon, value: .onThisDay) {
+                PhotoView(filter: Filter.onThisDay)
             }
         }
         .tabViewStyle(.sidebarAdaptable)

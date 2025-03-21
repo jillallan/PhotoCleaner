@@ -1,5 +1,5 @@
 //
-//  ImageView.swift
+//  PhotoDetailView.swift
 //  PhotoCleaner
 //
 //  Created by Jill Allan on 06/03/2025.
@@ -8,30 +8,28 @@
 import Photos
 import SwiftUI
 
-struct ImageView: View {
+struct PhotoDetailView: View {
     @Environment(\.displayScale) private var displayScale
-    let asset: PhotoAsset
-    @State var loadedImage: UIImage?
 
-    private static let itemSize = CGSize(width: 90, height: 90)
-    private var imageSize: CGSize {
-        return CGSize(width: Self.itemSize.width * min(displayScale, 2), height: Self.itemSize.height * min(displayScale, 2))
-    }
+    var asset: PhotoAsset
+    var imageSize: CGSize
+
+    @State var image: UIImage?
     
     var body: some View {
-        let _ = print("hello view")
         VStack {
-            Text("Hello image view")
-            if let loadedImage {
-                Image(uiImage: loadedImage)
+            if let image {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                ProgressView()
+                    .scaleEffect(0.5)
             }
         }
         .onAppear {
-            print("Hello")
             let imageManager = PHImageManager.default()
 
-            print(asset.identifier)
-            print(String(describing: asset.phAsset?.localIdentifier))
             if let phAsset = asset.phAsset {
                 imageManager
                     .requestImage(
@@ -40,8 +38,7 @@ struct ImageView: View {
                         contentMode: .aspectFit,
                         options: nil) { image, info in
                             if let image {
-                                print(image.size)
-                                loadedImage = image
+                                self.image = image
                             }
                         }
             }
