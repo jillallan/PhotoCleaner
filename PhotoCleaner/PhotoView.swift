@@ -43,6 +43,7 @@ struct PhotoView: View {
                 Task {
                      await photoCollection.refreshPhotoAssets()
                 }
+                
             }
             .navigationTitle(filter.name)
         }
@@ -57,38 +58,29 @@ struct PhotoView: View {
     }
 
     private func photoItemView(asset: PhotoAsset) -> some View {
-        PhotoDetailView(asset: asset, imageSize: imageSize)
+        PhotoItemView(
+            asset: asset,
+            cache: photoCollection.cache,
+            imageSize: imageSize
+        )
             .frame(
                 width: PhotoView.itemSize.width,
                 height: PhotoView.itemSize.height
             )
             .clipped()
             .cornerRadius(PhotoView.itemCornerRadius)
-    }
-
-    func getImage() {
-        let imageManager = PHImageManager.default()
-        if let collection = PHAssetCollection.fetchAssetCollections(
-            with: .smartAlbum,
-            subtype: .smartAlbumUserLibrary,
-            options: nil
-        ).firstObject {
-            if let asset = PHAsset.fetchAssets(
-                in: collection,
-                options: nil
-            ).firstObject {
-                imageManager
-                    .requestImage(
-                        for: asset,
-                        targetSize: imageSize,
-                        contentMode: .aspectFit,
-                        options: nil) { image, info in
-                            if let image {
-                                print(image.size)
-                            }
-                        }
+            .onAppear {
+                Task {
+                    await photoCollection.cache
+                        .startCachingImages(for: [asset], targetSize: imageSize)
+                }
             }
-        }
+            .onDisappear {
+                Task {
+                    await photoCollection.cache
+                        .stopCachingImages(for: [asset], targetSize: imageSize)
+                }
+            }
     }
 }
 

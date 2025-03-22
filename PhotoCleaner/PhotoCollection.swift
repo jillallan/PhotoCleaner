@@ -14,21 +14,7 @@ class PhotoCollection {
     var photoAssets: PhotoAssetCollection = PhotoAssetCollection(PHFetchResult<PHAsset>())
     var photoCollectionType: PhotoCollectionType? = nil
     var fetchOptions: PHFetchOptions? = nil
-
-    func refreshPhotoAssets(_ fetchResult: PHFetchResult<PHAsset>? = nil) async {
-        var newFetchResult = fetchResult
-
-        if newFetchResult == nil {
-            newFetchResult = PHAsset.fetchAssets(with: .image, options: self.fetchOptions)
-        }
-
-        if let newFetchResult {
-            await MainActor.run {
-                photoAssets = PhotoAssetCollection(newFetchResult)
-                logger.debug("PhotoCollection photoAssets refreshed: \(self.photoAssets.count)")
-            }
-        }
-    }
+    var cache = ImageCachingManager()
 
     init(collectionType: PhotoCollectionType) {
         self.photoCollectionType = photoCollectionType
@@ -57,6 +43,21 @@ class PhotoCollection {
         self.fetchOptions = fetchOptions
     }
 
+
+    func refreshPhotoAssets(_ fetchResult: PHFetchResult<PHAsset>? = nil) async {
+        var newFetchResult = fetchResult
+
+        if newFetchResult == nil {
+            newFetchResult = PHAsset.fetchAssets(with: .image, options: self.fetchOptions)
+        }
+
+        if let newFetchResult {
+            await MainActor.run {
+                photoAssets = PhotoAssetCollection(newFetchResult)
+                logger.debug("PhotoCollection photoAssets refreshed: \(self.photoAssets.count)")
+            }
+        }
+    }
 
     func createOnThisDayPredicate() -> NSCompoundPredicate? {
         let calendar = Calendar.current
