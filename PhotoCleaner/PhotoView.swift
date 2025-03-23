@@ -34,11 +34,16 @@ struct PhotoView: View {
                 ScrollView {
                     LazyVGrid(columns: columns) {
                         ForEach(photoCollection.photoAssets) { asset in
-                            photoItemView(asset: asset)
+                            NavigationLink(value: asset) {
+                                photoItemView(asset: asset)
+                            }
                         }
                     }
                 }
             }
+            .navigationDestination(for: PhotoAsset.self, destination: { asset in
+                PhotoDetailView(asset: asset, cache: photoCollection.cache)
+            })
             .onAppear {
                 Task {
                      await photoCollection.refreshPhotoAssets()
