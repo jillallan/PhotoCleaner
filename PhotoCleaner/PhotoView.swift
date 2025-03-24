@@ -41,14 +41,20 @@ struct PhotoView: View {
                     }
                 }
             }
-            .navigationDestination(for: PhotoAsset.self, destination: { asset in
-                PhotoDetailView(asset: asset, cache: photoCollection.cache)
+            .navigationDestination(
+for: PhotoAsset.self,
+destination: { asset in
+    PhotoDetailView(
+        assetID: asset.index ?? 0,
+        asset: asset,
+        cache: photoCollection.cache,
+        photoAssets: photoCollection.photoAssets
+    )
             })
             .onAppear {
                 Task {
                      await photoCollection.refreshPhotoAssets()
                 }
-                
             }
             .navigationTitle(filter.name)
         }
