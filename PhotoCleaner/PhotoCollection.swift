@@ -111,7 +111,29 @@ class PhotoCollection {
 
         return fetchResult.firstObject
     }
+
+    func nextImage(asset: PhotoAsset) -> PhotoAsset {
+        let currentIndex = self.photoAssets.firstIndex(of: asset) ?? -1
+        var nextIndex = currentIndex + 1
+        nextIndex = photoAssets.indices.contains(nextIndex) ? nextIndex : 0
+        return self.photoAssets[nextIndex]
+    }
+
+    func previousImage(asset: PhotoAsset) -> PhotoAsset {
+        let currentIndex = self.photoAssets.firstIndex(of: asset) ?? -1
+        var nextIndex = currentIndex.advanced(by: -1)
+        nextIndex = photoAssets.indices.contains(nextIndex) ? nextIndex : 0
+        return self.photoAssets[nextIndex]
+    }
 }
+
+//extension PhotoCollection: IteratorProtocol {
+//    func next() -> PhotoAsset? {
+//        
+//    }
+//
+//    public typealias Element = PhotoAsset
+//}
 
 fileprivate let logger = Logger(
     subsystem: "com.apple.swiftplaygroundscontent.capturingphotos",
