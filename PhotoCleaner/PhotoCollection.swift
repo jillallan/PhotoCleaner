@@ -113,15 +113,13 @@ class PhotoCollection {
     }
 
     func nextImage(asset: PhotoAsset) -> PhotoAsset {
-        let currentIndex = self.photoAssets.firstIndex(of: asset) ?? -1
-        var nextIndex = currentIndex + 1
+        var nextIndex = asset.index.advanced(by: 1)
         nextIndex = photoAssets.indices.contains(nextIndex) ? nextIndex : 0
         return self.photoAssets[nextIndex]
     }
 
     func previousImage(asset: PhotoAsset) -> PhotoAsset {
-        let currentIndex = self.photoAssets.firstIndex(of: asset) ?? -1
-        var nextIndex = currentIndex.advanced(by: -1)
+        var nextIndex = asset.index.advanced(by: -1)
         nextIndex = photoAssets.indices.contains(nextIndex) ? nextIndex : 0
         return self.photoAssets[nextIndex]
     }

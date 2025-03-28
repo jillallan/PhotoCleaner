@@ -10,6 +10,7 @@ import SwiftUI
 
 struct PhotoDetailView: View {
     @State var asset: PhotoAsset
+    @State var cachedAssets: [PhotoAsset] = []
     var cache: ImageCachingManager
     let photoCollection: PhotoCollection
     @State var image: Image?
@@ -39,6 +40,13 @@ struct PhotoDetailView: View {
         }
         .onChange(of: asset) {
             fetchImage(for: asset)
+            cacheAdjacentImages(for: asset)
+        }
+        .onAppear {
+            cacheAdjacentImages(for: asset)
+        }
+        .onDisappear {
+            stopCachingImages()
         }
     }
 
@@ -47,6 +55,7 @@ struct PhotoDetailView: View {
             Button {
                 let previousAsset = photoCollection.previousImage(asset: self.asset)
                 self.asset = previousAsset
+
 
             } label: {
                 Label("Left", systemImage: "arrow.backward")
@@ -82,6 +91,28 @@ struct PhotoDetailView: View {
             )
         }
     }
+
+    func cacheAdjacentImages(for asset: PhotoAsset) {
+        Task {
+            await photoCollection.cache
+                .stopCachingImages(for: cachedAssets, targetSize: imageSize)
+
+            cachedAssets = [
+                photoCollection.nextImage(asset: asset),
+                photoCollection.previousImage(asset: asset)
+            ]
+
+            await photoCollection.cache
+                .startCachingImages(for: cachedAssets, targetSize: imageSize)
+        }
+    }
+
+    func stopCachingImages() {
+        Task {
+            await photoCollection.cache
+                .stopCachingImages(for: cachedAssets, targetSize: imageSize)
+        }
+    }
 }
 
 #Preview {
@@ -93,7 +124,6 @@ struct PhotoDetailView: View {
     PhotoDetailView(
         asset: asset,
         cache: ImageCachingManager(),
-//        navPath: .constant([]),
         photoCollection: photoCollection,
         image: image
     )
