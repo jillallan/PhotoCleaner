@@ -11,10 +11,10 @@ import Photos
 struct PhotoAsset: Identifiable {
     var id: String { identifier }
     var identifier: String = UUID().uuidString
-    var index: Int?
+    var index: Int
     var phAsset: PHAsset?
 
-    init(phAsset: PHAsset, index: Int?) {
+    init(phAsset: PHAsset, index: Int) {
         self.phAsset = phAsset
         self.index = index
         self.identifier = phAsset.localIdentifier
