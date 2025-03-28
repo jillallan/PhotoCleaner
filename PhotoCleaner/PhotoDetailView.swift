@@ -9,14 +9,14 @@ import Photos
 import SwiftUI
 
 struct PhotoDetailView: View {
-    @State var assetID: Int
-    var asset: PhotoAsset
+    @State var asset: PhotoAsset
     var cache: ImageCachingManager
-    @State var photoAssets: PhotoAssetCollection
+    let photoCollection: PhotoCollection
     @State var image: Image?
     private let imageSize = CGSize(width: 1024, height: 1024)
 
     var body: some View {
+
         VStack {
             if let image = image {
                 image
@@ -35,59 +35,27 @@ struct PhotoDetailView: View {
         .toolbarVisibility(.hidden, for: .tabBar)
         .task {
             guard image == nil else { return }
-            let assetq = photoAssets[assetID]
-            print(assetq)
-            await cache
-                .requestImage(for: assetq, targetSize: imageSize, completion: { image in
-                    Task {
-                        if let image {
-                            self.image = image
-                        }
-                    }
-                })
-
+            fetchImage(for: asset)
+        }
+        .onChange(of: asset) {
+            fetchImage(for: asset)
         }
     }
 
     private func buttonView() -> some View {
         HStack(spacing: 60) {
             Button {
-                Task {
-                    //                await asset.setIsFavorite(!asset.isFavorite)
-                    assetID -= 1
-                    let assetq = photoAssets[assetID]
-                    print(assetq)
-                    await cache
-                        .requestImage(for: assetq, targetSize: imageSize, completion: { image in
-                            Task {
-                                if let image {
-                                    self.image = image
-                                }
-                            }
-                        })
+                let previousAsset = photoCollection.previousImage(asset: self.asset)
+                self.asset = previousAsset
 
-                }
             } label: {
                 Label("Left", systemImage: "arrow.backward")
                     .font(.system(size: 24))
             }
 
             Button {
-                Task {
-                    //                await asset.setIsFavorite(!asset.isFavorite)
-                    assetID += 1
-                    let assetq = photoAssets[assetID]
-                    print(assetq)
-                    await cache
-                        .requestImage(for: assetq, targetSize: imageSize, completion: { image in
-                            Task {
-                                if let image {
-                                    self.image = image
-                                }
-                            }
-                        })
-
-                }
+                let nextAsset = photoCollection.nextImage(asset: self.asset)
+                self.asset = nextAsset
             } label: {
                 Label("Right", systemImage: "arrow.forward")
                     .font(.system(size: 24))
@@ -100,18 +68,33 @@ struct PhotoDetailView: View {
         .background(Color.secondary.colorInvert())
         .cornerRadius(15)
     }
+
+    func fetchImage(for asset: PhotoAsset) {
+        Task {
+            await cache
+                .requestImage(for: asset, targetSize: imageSize, completion: { image in
+                    Task {
+                        if let image {
+                            self.image = image
+                        }
+                    }
+                }
+            )
+        }
+    }
 }
 
 #Preview {
     let photoAssets = PhotoCollection(collectionType: .all).photoAssets
+    let photoCollection = PhotoCollection(collectionType: .all)
     let asset = PhotoAsset(phAsset: PHAsset(), index: 1)
     let image = Image("sheep")
 
     PhotoDetailView(
-        assetID: 1,
         asset: asset,
         cache: ImageCachingManager(),
-        photoAssets: photoAssets,
+//        navPath: .constant([]),
+        photoCollection: photoCollection,
         image: image
     )
 }

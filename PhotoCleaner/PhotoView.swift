@@ -15,6 +15,7 @@ struct PhotoView: View {
     var photoCollection = PhotoCollection(collectionType: .all)
 
     @State var photoAssets: PhotoAssetCollection?
+    @State private var scrollPosition = ScrollPosition()
 
     private static let itemSpacing = 12.0
     private static let itemCornerRadius = 15.0
@@ -36,24 +37,27 @@ struct PhotoView: View {
                         ForEach(photoCollection.photoAssets) { asset in
                             NavigationLink(value: asset) {
                                 photoItemView(asset: asset)
+                                    .rotationEffect(Angle(degrees: 180))
+                                    .scaleEffect(x: -1.0, y: 1.0, anchor: .center)
                             }
                         }
                     }
                 }
+                .rotationEffect(Angle(degrees: 180))
+                .scaleEffect(x: -1.0, y: 1.0, anchor: .center)
             }
             .navigationDestination(
-for: PhotoAsset.self,
-destination: { asset in
-    PhotoDetailView(
-        assetID: asset.index ?? 0,
-        asset: asset,
-        cache: photoCollection.cache,
-        photoAssets: photoCollection.photoAssets
-    )
-            })
+                for: PhotoAsset.self,
+                destination: { asset in
+                    PhotoDetailView(
+                        asset: asset,
+                        cache: photoCollection.cache,
+                        photoCollection: photoCollection
+                    )
+                })
             .onAppear {
                 Task {
-                     await photoCollection.refreshPhotoAssets()
+                    await photoCollection.refreshPhotoAssets()
                 }
             }
             .navigationTitle(filter.name)
@@ -74,24 +78,24 @@ destination: { asset in
             cache: photoCollection.cache,
             imageSize: imageSize
         )
-            .frame(
-                width: PhotoView.itemSize.width,
-                height: PhotoView.itemSize.height
-            )
-            .clipped()
-            .cornerRadius(PhotoView.itemCornerRadius)
-            .onAppear {
-                Task {
-                    await photoCollection.cache
-                        .startCachingImages(for: [asset], targetSize: imageSize)
-                }
+        .frame(
+            width: PhotoView.itemSize.width,
+            height: PhotoView.itemSize.height
+        )
+        .clipped()
+        .cornerRadius(PhotoView.itemCornerRadius)
+        .onAppear {
+            Task {
+                await photoCollection.cache
+                    .startCachingImages(for: [asset], targetSize: imageSize)
             }
-            .onDisappear {
-                Task {
-                    await photoCollection.cache
-                        .stopCachingImages(for: [asset], targetSize: imageSize)
-                }
+        }
+        .onDisappear {
+            Task {
+                await photoCollection.cache
+                    .stopCachingImages(for: [asset], targetSize: imageSize)
             }
+        }
     }
 }
 
