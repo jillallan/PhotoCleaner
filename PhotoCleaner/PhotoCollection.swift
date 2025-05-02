@@ -47,6 +47,8 @@ class PhotoCollection {
     func refreshPhotoAssets(_ fetchResult: PHFetchResult<PHAsset>? = nil) async {
         var newFetchResult = fetchResult
 
+
+
         if newFetchResult == nil {
             newFetchResult = PHAsset.fetchAssets(with: .image, options: self.fetchOptions)
         }

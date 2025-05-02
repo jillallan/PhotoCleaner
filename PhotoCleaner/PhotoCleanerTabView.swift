@@ -19,7 +19,8 @@ struct PhotoCleanerTabView: View {
                 PhotoView(filter: Filter.all)
             }
             Tab(Filter.onThisDay.name, systemImage: Filter.onThisDay.icon, value: .onThisDay) {
-                PhotoView(filter: Filter.onThisDay)
+                PhotoView(filter: Filter.all)
+
             }
         }
         .tabViewStyle(.sidebarAdaptable)
