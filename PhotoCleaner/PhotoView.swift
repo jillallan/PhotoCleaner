@@ -15,7 +15,9 @@ struct PhotoView: View {
     var photoCollection = PhotoCollection(collectionType: .all)
 
     @State var photoAssets: PhotoAssetCollection?
-    @State private var scrollPosition = ScrollPosition()
+    @Namespace var namespace
+
+    @State var selectedAsset: PhotoAsset? = nil
 
     private static let itemSpacing = 12.0
     private static let itemCornerRadius = 15.0
@@ -32,29 +34,42 @@ struct PhotoView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                ScrollView {
-                    LazyVGrid(columns: columns) {
-                        ForEach(photoCollection.photoAssets) { asset in
-                            NavigationLink(value: asset) {
-                                photoItemView(asset: asset)
-                                    .rotationEffect(Angle(degrees: 180))
-                                    .scaleEffect(x: -1.0, y: 1.0, anchor: .center)
+                if selectedAsset == nil {
+                    ScrollView {
+                        LazyVGrid(columns: columns) {
+                            ForEach(photoCollection.photoAssets) { asset in
+                                Button {
+                                    withAnimation(.spring()) {
+                                        selectedAsset = asset
+                                    }
+
+                                } label: {
+                                    photoItemView(asset: asset)
+                                }
+                                .buttonStyle(.plain)
+                                .matchedGeometryEffect(
+                                    id: asset,
+                                    in: namespace
+                                )
                             }
                         }
                     }
-                }
-                .rotationEffect(Angle(degrees: 180))
-                .scaleEffect(x: -1.0, y: 1.0, anchor: .center)
-            }
-            .navigationDestination(
-                for: PhotoAsset.self,
-                destination: { asset in
+//                    .rotationEffect(Angle(degrees: 180))
+//                    .scaleEffect(x: -1.0, y: 1.0, anchor: .center)
+                } else if let asset = selectedAsset {
                     PhotoDetailView(
                         asset: asset,
                         cache: photoCollection.cache,
                         photoCollection: photoCollection
                     )
-                })
+                    .onTapGesture {
+                        withAnimation(.interactiveSpring(response: 0.5, dampingFraction: 0.9)) {
+                            selectedAsset = nil
+                        }
+                    }
+                    .matchedGeometryEffect(id: asset, in: namespace)
+                }
+            }
             .onAppear {
                 Task {
                     await photoCollection.refreshPhotoAssets()
